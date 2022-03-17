@@ -1,0 +1,157 @@
+Przerwanie 21h:
+-funkcja ah=1
+	Odczytanie znaku z klawiatury i wpisanie kodu ASCII do AL
+
+kod:
+PUSH AX
+PUSH AL
+MOV AX 1H
+INT21H
+... wykonanie funkcji na znaku zapisanym w AL
+POP AL
+POP AX
+
+-funckja ah=2
+	Wyświetlenie znaku na podstawie kodu ASCII w rejestrze AL
+
+kod:
+MOV AL (kod znaku)
+PUSH AX
+MOV AX 2H
+INT21H
+POP AX
+
+-funkcja ah=42
+	Pobranie daty
+	Przerwanie pobiera datę i zapisuje ją do rejestrów:
+	CX-rok
+	DH-miesiac
+	DL-dzień
+
+kod:
+
+PUSH AX
+PUSH CX
+PUSH DX
+MOV AH 2AH
+int21h
+... funkcje na odczytanej dacie
+POP DX
+POP CX
+POP AX
+
+-funkcja ah=43
+	ustawienie daty
+	program jedynie sprawdza poprawność podanej daty nie ustawia jej w systemie
+	Dane odczytywane są z rejestrów.
+	CX-rok
+	DH-miesiac
+	DL-dzień
+
+kod:
+MOV CX (rok)
+MOV DH (miesiac)
+MOV DL (dzien)
+PUSH AX
+MOV AX 2BH
+INT21H
+POP AX
+
+-funkcja ah=44
+	Pobranie godzine
+	Przerwanie pobiera godzine i zapisuje ją do rejestrów:
+	CH-godzina
+	CL-minuta
+	DH-sekunda
+	DL-setne sekundy
+
+kod:
+
+PUSH AX
+PUSH CX
+PUSH DX
+MOV AH 2CH
+int21h
+... funkcje na odczytanej godzinie
+POP DX
+POP CX
+POP AX
+
+-funkcja ah=45
+	ustawienie daty
+	program jedynie sprawdza poprawność podanej godziny nie ustawia jej w systemie
+	Dane odczytywane są z rejestrów.
+	CH-godzina
+	CL-minuta
+	DH-sekunda
+	DL-setne sekundy
+
+kod:
+MOV CH (godzina)
+MOV CL (minuta)
+MOV DH (sekunda)
+MOV DL (setnasekundy)
+PUSH AX
+MOV AX 2CH
+INT21H
+POP AX
+	
+-funkcja ah=0
+	Zakończenie programu
+	Funkcja wyłącza program
+
+kod:
+MOV AX 0H
+INT21H
+
+Przerwanie 15h:
+-funkcja ah=134
+	Program czeka określoną liczbę milisekund
+	czas do odczekania znajduje się w rejestrze CX, jeśli jest tam wartość zero, wtedy czas brany jest z rejestru DX
+kod:
+
+PUSH AX
+PUSH CX
+MOV AH 86H
+MOV CX FFFH
+INT15H
+POP CX
+POP AX
+ 
+Przerwanie 16h:
+-funkcja ah=2
+	Zwraca do rejestru AL 8 bitową cyfrę
+	Bit o stanie wysokim oznacza, który ze specjalnych przycisków jest naciśnięty
+	bit7 = klawisz Insert jest aktywny
+	bit6 = Caps Lock aktywny
+	bit5 = Num Lock aktywny
+	bit4 = Scroll Lock aktywny
+	bit3 = naciśnięty klawisz ALT
+	bit2 = naciśnięty klawisz CTRL
+	bit1 = naciśnięty lewy klawisz SHIFT
+	bit0 = naciśnięty prawy klawisz SHIFT
+
+kod:
+PUSH AX
+MOV AX 2H
+INT16H
+... funkcja operująca na bitach zapisanych w AL
+POP AX
+
+Przerwanie 10h:
+-funkcja ah=11
+	Funkcja ustawia kolor tła, w naszym programie zmieniany jest kolor pola tekstowego
+	W rejestrze BL przechowujemy wartość koloru, który chcemy wyświetlić
+	wartości kolorów można odczytać na wikipedii
+	https://en.wikipedia.org/wiki/BIOS_color_attributes
+	Visual nie udostępniał wszystkich tych kolorów, więc niektóre są inne
+
+kod:
+PUSH AX
+PUSH BX
+MOV AX BH
+MOV BH 0H
+MOV BL kolor
+INT10H
+POP BX
+POP AX
